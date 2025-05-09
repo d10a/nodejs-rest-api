@@ -1,7 +1,9 @@
 import express from 'express';
 import 'dotenv/config'
+// import ViteExpress from "vite-express"
+
 const app = express()
-const port = process.env.PORT
+const port = parseInt(process.env.PORT || '3000')
 import mongoose from 'mongoose';
 import { BlogPostModel } from './model/BlogPostModel';
 import { TZDate } from '@date-fns/tz';
