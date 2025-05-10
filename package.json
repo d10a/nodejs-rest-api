@@ -4,7 +4,7 @@
   "description": "nodejs-rest-api",
   "main": "dist/src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest",
     "build": "npx tsc",
     "clean": "rimraf ./dist ./node_modules",
     "start": "nodemon src/app.ts",

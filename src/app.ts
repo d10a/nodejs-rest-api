@@ -7,6 +7,8 @@ const port = parseInt(process.env.PORT || '3000')
 import mongoose from 'mongoose';
 import { BlogPostModel } from './model/BlogPostModel';
 import { TZDate } from '@date-fns/tz';
+import { CreateBlogPostHandler } from '../domain/event/create-blog-post/CreateBlogPostHandler';
+import { CreateBlogPostRepository } from './repository/CreateBlogPostRepository';
 
 app.use(express.json())
 app.get('/', (req, res) => {
@@ -20,7 +22,7 @@ app.get('/config', (req, res) => {
     })
 })
 
-
+// list all blog
 app.get('/post', async (req, res) => {
     try {
         const blogPosts = await BlogPostModel.find()
@@ -30,32 +32,21 @@ app.get('/post', async (req, res) => {
             message: error
         })
     }
-
 })
+
 app.post('/post', async (req, res) => {
+    const eventHandler = new CreateBlogPostHandler(new CreateBlogPostRepository())
     try {
-        const newBlogPost = new BlogPostModel({
-            title: req.body.title,
-            author: req.body.author,
-            body: req.body.body,
-            comments: [],
-            date: new TZDate(new Date(), process.env.TIMEZONE),
-            hidden: req.body.hidden,
-            meta: {
-                votes: 0,
-                favs: 0
-            }
-        });
-        await newBlogPost.save()
-        return res.status(201).json(newBlogPost.toJSON())
+        await eventHandler.execute(req.body)
+        return res.status(201).json(eventHandler.getResult())
     } catch (error) {
         return res.status(500).json({
-            message: error
+            message: eventHandler.getResult()
         })
     }
-
-
 })
+
+
 app.put('/post/:id', async (req, res) => {
     try {
         const query = { _id: req.params.id }
